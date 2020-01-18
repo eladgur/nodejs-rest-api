@@ -2,25 +2,19 @@ var util = require('./util');
 
 let topPosts = null
 
-exports.update = function () {
-    util.queryTopPosts();
+function update() {
+    util.queryTopPosts()
+    .then(posts => topPosts = posts)
 
-    // Post.find({})
-    //     .sort({
-    //         'score': -1
-    //     })
-    //     .limit(30)
-    //     .exec(function (err, posts) {
-    //         if (err) res.send(err);
-    //         topPosts = posts;
-    //     });
+return topPosts;
 }
 
-exports.getTopPosts = function () {
-    if (topPosts === null) {
-        util.queryTopPosts()
-            .then(posts => topPosts = posts)
-    }
-
+function getTopPosts() {
+    if (topPosts === null) update();
     return topPosts;
+}
+
+module.exports = {
+    update: update,
+    getTopPosts: getTopPosts
 }

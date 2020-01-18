@@ -14,14 +14,14 @@ function calcScore(post) {
     return score;
 }
 
-exports.listAll = function (req, res) {
+function listAll(req, res) {
     Post.find({}, function (err, posts) {
         if (err) res.send(err);
         res.json(posts);
     });
 };
 
-exports.create = function (req, res) {
+function create(req, res) {
     var post = new Post(req.body);
     post.save(function (err, Post) {
         if (err) res.send(err);
@@ -30,7 +30,7 @@ exports.create = function (req, res) {
     });
 };
 
-exports.read = function (req, res) {
+function read(req, res) {
     Post.findById(req.params.id, function (err, post) {
         if (err)
             res.send(err);
@@ -38,7 +38,7 @@ exports.read = function (req, res) {
     });
 };
 
-exports.update = function (req, res) {
+function update(req, res) {
     Post.findOneAndUpdate({
         _id: req.body.id
     }, req.body, {
@@ -50,7 +50,7 @@ exports.update = function (req, res) {
     });
 };
 
-exports.delete = function (req, res) {
+function deletePost(req, res) {
     Post.remove({
         _id: req.params.id
     }, function (err, post) {
@@ -87,14 +87,25 @@ function updateVotes(req, res, voteType) {
     });
 }
 
-exports.upvote = function (req, res) {
+function upvote(req, res) {
     updateVotes(req, res, VoteType.UP);
 };
 
-exports.downvote = function (req, res) {
+function downvote(req, res) {
     updateVotes(req, res, VoteType.DOWN);
 };
 
-exports.topPosts = function (req, res) {
+function topPosts(req, res) {
     res.json(cache.getTopPosts());
 };
+
+module.exports = {
+    listAll: listAll,
+    create: create,
+    read: read,
+    update: update,
+    delete: deletePost,
+    upvote: upvote,
+    downvote: downvote,
+    topPosts: topPosts
+}
