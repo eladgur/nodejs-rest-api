@@ -6,7 +6,10 @@ function createRoutes(app) {
     .put(posts.update)
     .post(posts.create);
 
-  app.route('/posts/:id')
+  app.route('/top-posts')
+    .get(posts.topPosts);
+
+    app.route('/posts/:id')
     .get(posts.read)
     .delete(posts.delete);
 

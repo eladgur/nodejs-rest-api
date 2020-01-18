@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
-    Post = mongoose.model('Posts');
+    Post = mongoose.model('Posts'),
+    cache = require('./cache');
 
 function calcScore(post) {
     let {
@@ -14,18 +15,17 @@ function calcScore(post) {
 }
 
 exports.listAll = function (req, res) {
-    Post.find({}, function (err, Post) {
-        if (err)
-            res.send(err);
-        res.json(Post);
+    Post.find({}, function (err, posts) {
+        if (err) res.send(err);
+        res.json(posts);
     });
 };
 
 exports.create = function (req, res) {
     var post = new Post(req.body);
     post.save(function (err, Post) {
-        if (err)
-            res.send(err);
+        if (err) res.send(err);
+        cache.update();
         res.json(Post);
     });
 };
@@ -80,6 +80,7 @@ function updateVotes(req, res, voteType) {
 
         post.save(function (err, post) {
             if (err) res.send(err);
+            cache.update();
             res.json(post);
         })
 
@@ -92,4 +93,8 @@ exports.upvote = function (req, res) {
 
 exports.downvote = function (req, res) {
     updateVotes(req, res, VoteType.DOWN);
+};
+
+exports.topPosts = function (req, res) {
+    res.json(cache.getTopPosts());
 };
