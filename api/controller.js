@@ -46,6 +46,7 @@ function update(req, res) {
     }, function (err, post) {
         if (err)
             res.send(err);
+        cache.update();    
         res.json(post);
     });
 };
