@@ -46,7 +46,7 @@ function update(req, res) {
     }, function (err, post) {
         if (err)
             res.send(err);
-        cache.update();    
+        cache.update();
         res.json(post);
     });
 };
@@ -70,6 +70,7 @@ const VoteType = {
 
 function updateVotes(req, res, voteType) {
     const id = req.params.id;
+
     Post.findById(id, function (err, post) {
         if (err) res.send(err);
 
@@ -85,20 +86,25 @@ function updateVotes(req, res, voteType) {
             res.json(post);
         })
 
-    });
+    })
 }
 
 function upvote(req, res) {
     updateVotes(req, res, VoteType.UP);
-};
+}
 
 function downvote(req, res) {
     updateVotes(req, res, VoteType.DOWN);
-};
+}
 
-function topPosts(req, res) {
-    res.json(cache.getTopPosts());
-};
+async function topPosts(req, res, next) {
+    try {
+        const topPosts = await cache.getTopPosts();
+        res.json(topPosts);
+    } catch (err) {
+        res.send(err)
+    }
+}
 
 module.exports = {
     listAll: listAll,

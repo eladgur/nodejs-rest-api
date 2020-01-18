@@ -1,16 +1,24 @@
-var util = require('./util');
+let mongoose = require('mongoose'),
+    Post = mongoose.model('Posts');
 
 let topPosts = null
 
-function update() {
-    util.queryTopPosts()
-    .then(posts => topPosts = posts)
-
-return topPosts;
+function queryTopPosts() {
+    return Post
+        .find({})
+        .sort({
+            'score': -1
+        })
+        .limit(30)
+        .exec();
 }
 
-function getTopPosts() {
-    if (topPosts === null) update();
+async function update() {
+    topPosts = await queryTopPosts();
+}
+
+async function getTopPosts() {
+    if (topPosts === null) await update();
     return topPosts;
 }
 
