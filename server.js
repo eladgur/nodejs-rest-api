@@ -6,7 +6,7 @@ let express = require('express'),
   routes = require('./api/routes'); 
   
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/Tododb'); 
+mongoose.connect('mongodb://db/my-DB'); 
 
 app.use(express.json());
 
