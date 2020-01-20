@@ -57,6 +57,7 @@ function deletePost(req, res) {
     }, function (err, post) {
         if (err)
             res.send(err);
+        cache.update();    
         res.json({
             message: 'Post successfully deleted'
         });
