@@ -1,6 +1,14 @@
 var mongoose = require('mongoose'),
-    Post = mongoose.model('Posts'),
-    cache = require('./cache');
+    Post = mongoose.model('Posts');
+
+function queryTopPosts() {
+    return Post
+        .find({})
+        .sort({
+            'score': -1
+        })
+        .exec();
+}
 
 function calcScore(post) {
     let {
@@ -25,7 +33,6 @@ function create(req, res) {
     var post = new Post(req.body);
     post.save(function (err, Post) {
         if (err) res.send(err);
-        cache.update();
         res.json(Post);
     });
 };
@@ -46,7 +53,6 @@ function update(req, res) {
     }, function (err, post) {
         if (err)
             res.send(err);
-        cache.update();
         res.json(post);
     });
 };
@@ -57,7 +63,6 @@ function deletePost(req, res) {
     }, function (err, post) {
         if (err)
             res.send(err);
-        cache.update();    
         res.json({
             message: 'Post successfully deleted'
         });
@@ -83,7 +88,6 @@ function updateVotes(req, res, voteType) {
 
         post.save(function (err, post) {
             if (err) res.send(err);
-            cache.update();
             res.json(post);
         })
 
@@ -100,7 +104,7 @@ function downvote(req, res) {
 
 async function topPosts(req, res, next) {
     try {
-        const topPosts = await cache.getTopPosts();
+        const topPosts = queryTopPosts();
         res.json(topPosts);
     } catch (err) {
         res.send(err)
