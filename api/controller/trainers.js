@@ -1,8 +1,8 @@
-var mongoose = require('mongoose'),
-    Post = mongoose.model('Posts');
+const mongoose = require('mongoose'),
+    Trainer = require('../model/Trainer');
 
-function queryTopPosts() {
-    return Post
+function queryTopTrainers() {
+    return Trainer
         .find({})
         .sort({
             'score': -1
@@ -10,11 +10,11 @@ function queryTopPosts() {
         .exec();
 }
 
-function calcScore(post) {
+function calcScore(trainer) { // should be timestamp + votes
     let {
         votes,
         date
-    } = post;
+    } = trainer;
     let currentDate = new Date();
     let diffDays = parseInt((currentDate - date) / (1000 * 60 * 60 * 24), 10);
     let score = votes - diffDays;
@@ -23,48 +23,48 @@ function calcScore(post) {
 }
 
 function listAll(req, res) {
-    Post.find({}, function (err, posts) {
+    Trainer.find({}, function (err, trainers) {
         if (err) res.send(err);
-        res.json(posts);
+        res.json(trainers);
     });
 };
 
 function create(req, res) {
-    var post = new Post(req.body);
-    post.save(function (err, Post) {
+    var trainer = new Trainer(req.body);
+    trainer.save(function (err, trainer) {
         if (err) res.send(err);
-        res.json(Post);
+        res.json(trainer);
     });
 };
 
 function read(req, res) {
-    Post.findById(req.params.id, function (err, post) {
+    Trainer.findById(req.params.id, function (err, trainer) {
         if (err)
             res.send(err);
-        res.json(post);
+        res.json(trainer);
     });
 };
 
 function update(req, res) {
-    Post.findOneAndUpdate({
+    Trainer.findOneAndUpdate({
         _id: req.body.id
     }, req.body, {
         new: true
-    }, function (err, post) {
+    }, function (err, trainer) {
         if (err)
             res.send(err);
-        res.json(post);
+        res.json(trainer);
     });
 };
 
-function deletePost(req, res) {
-    Post.remove({
+function deleteTrainer(req, res) {
+    Trainer.remove({
         _id: req.params.id
-    }, function (err, post) {
+    }, function (err, trainer) {
         if (err)
             res.send(err);
         res.json({
-            message: 'Post successfully deleted'
+            message: 'Trainer successfully deleted'
         });
     });
 };
@@ -77,18 +77,18 @@ const VoteType = {
 function updateVotes(req, res, voteType) {
     const id = req.params.id;
 
-    Post.findById(id, function (err, post) {
+    Trainer.findById(id, function (err, trainer) {
         if (err) res.send(err);
 
         if (voteType === VoteType.UP)
-            post.votes++
+            trainer.likes++
         else
-            post.votes--
-        post.score = calcScore(post);
+            trainer.likes--
+        trainer.score = calcScore(trainer);
 
-        post.save(function (err, post) {
+        trainer.save(function (err, trainer) {
             if (err) res.send(err);
-            res.json(post);
+            res.json(trainer);
         })
 
     })
@@ -102,10 +102,10 @@ function downvote(req, res) {
     updateVotes(req, res, VoteType.DOWN);
 }
 
-async function topPosts(req, res, next) {
+async function topTrainers(req, res, next) {
     try {
-        const topPosts = queryTopPosts();
-        res.json(topPosts);
+        const topTrainers = queryTopTrainers();
+        res.json(topTrainers);
     } catch (err) {
         res.send(err)
     }
@@ -116,8 +116,8 @@ module.exports = {
     create: create,
     read: read,
     update: update,
-    delete: deletePost,
+    delete: deleteTrainer,
     upvote: upvote,
     downvote: downvote,
-    topPosts: topPosts
+    topTrainers: topTrainers
 }
